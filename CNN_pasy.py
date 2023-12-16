@@ -243,7 +243,6 @@ for epoch in range(epochs):
         # backward
         optimizer.zero_grad()
         loss.backward()
-        print(epoch)
 
         #gradient descent or adam step
 
@@ -255,6 +254,9 @@ for epoch in range(epochs):
     print(f"Epoch [{epoch + 1}/{epochs}] Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.2f}%")
     model.train()  # Powrót do trybu treningowego
 
+
+# save modelu
+torch.save(model, 'crosswalks_detection.pth')
 
 check_accuracy(train_loader, model)
 check_accuracy(test_loader, model)
