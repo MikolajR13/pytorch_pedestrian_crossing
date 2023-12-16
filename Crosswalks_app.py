@@ -76,6 +76,7 @@ while 1:
 
     #przyjmowanie obrazu idk czy video czy klatki
     # jeżeli video to trzeba dodać dzielenie na klatki live czy coś
+    # można dodać filtry obrazu
     time_start = timeit.timeit()
     grid_numbers = model_eval(image_operations('images_test')) #tutaj przyjmuje klatki - folder tylko do testów
     time_end = timeit.timeit()

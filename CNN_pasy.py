@@ -2,31 +2,29 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
 from torch.utils.data import DataLoader
-import torchvision.datasets as datasets
 import torchvision.transforms as transforms
-import os
-import pandas as pd
-from skimage import io
 from Data_generator import CrossroadsDataset
+import matplotlib.pyplot as plt
 
 #zmienne
-path_to_dataset = 'aaa'
+path_to_dataset = 'aaa' #aaa - testowy dataset - żeby sprawdzić czy działa,  dataset - dataset do nauki
 batch_size = 64
 
-dataset = CrossroadsDataset(csv_file='nazwy_plikow.csv', root_dir='dataset',
-                            transform=transforms.ToTensor())
+dataset = CrossroadsDataset(csv_file='nazwy_plikow1.csv', root_dir=path_to_dataset,
+                            transform=transforms.ToTensor()) # nazwy_plikow1.csv - żeby sprawdzić czy działa,
+                                                             # nazwy_plikow.csv - do nauki
 size = len(dataset)
 val_len = int(size/100*15)
 test_len = int(size/100*15)
 train_len = size - val_len - test_len
 
-train_set, val_set, test_set = torch.utils.data.random_split(dataset, [train_len, val_len , test_len])
+train_set, val_set, test_set = torch.utils.data.random_split(dataset, [train_len, val_len, test_len])
 
 train_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(dataset=val_set, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
+
 
 class BottleneckLayer(nn.Module):
     def __init__(self, in_channels, expansion, out_channels, stride=1):
@@ -69,7 +67,6 @@ class BottleneckLayer(nn.Module):
         return y
 
 
-
 class FirstTransormation(nn.Module):
     def __init__(self, in_channels):
         super(FirstTransormation, self).__init__()
@@ -89,6 +86,7 @@ class FirstTransormation(nn.Module):
         x = self.relu6(x)
         x = self.maxpool(x)
         return x
+
 
 class LastLayers(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -110,6 +108,7 @@ class LastLayers(nn.Module):
         x = self.avg(x)
 
         return x
+
 
 class Output(nn.Module):
     def __init__(self, in_channels, drop):
@@ -133,6 +132,7 @@ class Output(nn.Module):
 
         return x
 
+
 class Network(nn.Module):
     def __init__(self):
         super(Network, self).__init__()
@@ -155,6 +155,7 @@ class Network(nn.Module):
         # #wchodzi 128x28x28
         self.Last = LastLayers(128, 986)
         self.Out = Output(986, 0.5)
+
     def forward(self, x):
         x = self.input(x)
         #print(x.size())
@@ -194,7 +195,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 in_channel = 3
 learning_rate = 0.0001
 batch_size = 64
-epochs = 100
+epochs = 100 # default 20 powinno być ale dla testów dałem 100
 
 #ładujemy model do urządzenia
 model = Network().to(device)
@@ -204,6 +205,8 @@ model = Network().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 #sprawdzanie accuracy
+
+
 def check_accuracy(loader, model):
     num_correct =0
     num_samples = 0
@@ -226,11 +229,16 @@ def check_accuracy(loader, model):
         accuracy = float(num_correct)/float(num_samples)*100
         average_loss = loss / len(loader)
 
-        print(f'Got {num_correct}/ {num_samples} with accuracy {float(num_correct)/float(num_samples)*100:.2f}')
-
     model.train()
     return average_loss, accuracy
+
+
 #uczymy sieć
+
+val_losses = []
+val_accuracies = []
+train_losses = []
+train_accuracies = []
 
 
 for epoch in range(epochs):
@@ -244,13 +252,15 @@ for epoch in range(epochs):
         optimizer.zero_grad()
         loss.backward()
 
-        #gradient descent or adam step
-
         optimizer.step()
     model.eval()  # Ustawienie modelu w tryb ewaluacji
     val_loss, val_accuracy = check_accuracy(val_loader, model)  # Ocena na zbiorze walidacyjnym
+    val_losses.append(val_loss)
+    val_accuracies.append(val_accuracy)
     print(f"Epoch [{epoch + 1}/{epochs}] Validation Loss: {val_loss:.4f}, Validation Accuracy: {val_accuracy:.2f}%")
     train_loss, train_accuracy = check_accuracy(train_loader, model)
+    train_losses.append(train_loss)
+    train_accuracies.append(train_accuracy)
     print(f"Epoch [{epoch + 1}/{epochs}] Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.2f}%")
     model.train()  # Powrót do trybu treningowego
 
@@ -258,5 +268,28 @@ for epoch in range(epochs):
 # save modelu
 torch.save(model, 'crosswalks_detection.pth')
 
-check_accuracy(train_loader, model)
-check_accuracy(test_loader, model)
+test_loss, test_acc = check_accuracy(test_loader, model)
+print(f" Test Loss: {train_loss:.4f}, Test Accuracy: {train_accuracy:.2f}%")
+
+plt.figure(figsize=(12, 4))
+
+# Wykres val_loss i train_loss
+plt.subplot(1, 2, 1)
+plt.plot(val_losses, label='Validation Loss')
+plt.plot(train_losses, label='Train Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Validation & Train Loss')
+plt.legend()
+
+# Wykres val_accuracy i train_accuracy
+plt.subplot(1, 2, 2)
+plt.plot(val_accuracies, label='Validation Accuracy')
+plt.plot(train_accuracies, label='Train Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy (%)')
+plt.title('Validation & Train Accuracy')
+plt.legend()
+
+plt.tight_layout()
+plt.show()
