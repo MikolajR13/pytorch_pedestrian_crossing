@@ -2,6 +2,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from certifi.__main__ import args
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from Data_generator import CrossroadsDataset
@@ -195,7 +196,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 in_channel = 3
 learning_rate = 0.0001
 batch_size = 64
-epochs = 100 # default 20 powinno być ale dla testów dałem 100
+epochs = 5 # default 20 powinno być ale dla testów dałem 100
 
 #ładujemy model do urządzenia
 model = Network().to(device)
@@ -266,10 +267,18 @@ for epoch in range(epochs):
 
 
 # save modelu
-torch.save(model, 'crosswalks_detection.pth')
 
 test_loss, test_acc = check_accuracy(test_loader, model)
 print(f" Test Loss: {train_loss:.4f}, Test Accuracy: {train_accuracy:.2f}%")
+model.eval()
+torch.save(model.state_dict(), 'crosswalks_detection_test.pth')
+for param in model.parameters():
+    print(1)
+loaded_model = Network()
+loaded_model.load_state_dict(torch.load("crosswalks_detection_test.pth"))
+loaded_model.eval()
+for param in loaded_model.parameters():
+    print(2)
 
 plt.figure(figsize=(12, 4))
 
