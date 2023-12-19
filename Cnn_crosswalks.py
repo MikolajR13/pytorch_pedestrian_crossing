@@ -22,8 +22,8 @@ train_len = size - val_len - test_len
 train_set, val_set, test_set = torch.utils.data.random_split(dataset, [train_len, val_len, test_len])
 
 train_loader = DataLoader(dataset=train_set, batch_size=batch_size, shuffle=True)
-val_loader = DataLoader(dataset=val_set, batch_size=batch_size, shuffle=True)
-test_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(dataset=val_set, batch_size=batch_size, shuffle=False)
+test_loader = DataLoader(dataset=test_set, batch_size=batch_size, shuffle=False)
 
 
 class BottleneckLayer(nn.Module):
@@ -195,7 +195,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 in_channel = 3
 learning_rate = 0.0001
 batch_size = 64
-epochs = 20 # default 20 powinno być ale dla testów dałem 100
+epochs = 40 # default 20 powinno być ale dla testów dałem 100
+min_loss = float('inf')
+patience = 5
+counter = 0
 
 #ładujemy model do urządzenia
 model = Network().to(device)
@@ -253,6 +256,19 @@ for epoch in range(epochs):
         loss.backward()
 
         optimizer.step()
+
+        if loss < min_loss:
+            min_loss = loss
+            counter = 0
+        else:
+            counter += 1
+
+        if counter == patience:
+            print("Patience break")
+            break
+    if counter == patience:
+        print("Patience break")
+        break
     model.eval()  # Ustawienie modelu w tryb ewaluacji
     val_loss, val_accuracy = check_accuracy(val_loader, model)  # Ocena na zbiorze walidacyjnym
     val_losses.append(val_loss)
@@ -270,6 +286,7 @@ for epoch in range(epochs):
 test_loss, test_acc = check_accuracy(test_loader, model)
 print(f" Test Loss: {train_loss:.4f}, Test Accuracy: {train_accuracy:.2f}%")
 model.eval()
+
 torch.save(model.state_dict(), 'crosswalks_detection_test.pth')
 # for param in model.parameters():
 #     print(1)
