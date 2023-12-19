@@ -6,12 +6,14 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from Data_generator import CrossroadsDataset
 import matplotlib.pyplot as plt
+from torch.utils.mobile_optimizer import optimize_for_mobile
+
 
 #zmienne
-path_to_dataset = 'dataset' #aaa - testowy dataset - żeby sprawdzić czy działa,  dataset - dataset do nauki
+path_to_dataset = 'aaa' #aaa - testowy dataset - żeby sprawdzić czy działa,  dataset - dataset do nauki
 batch_size = 64
 
-dataset = CrossroadsDataset(csv_file='nazwy_plikow.csv', root_dir=path_to_dataset,
+dataset = CrossroadsDataset(csv_file='nazwy_plikow1.csv', root_dir=path_to_dataset,
                             transform=transforms.ToTensor()) # nazwy_plikow1.csv - żeby sprawdzić czy działa,
                                                              # nazwy_plikow.csv - do nauki
 size = len(dataset)
@@ -195,7 +197,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 in_channel = 3
 learning_rate = 0.0001
 batch_size = 64
-epochs = 40 # default 20 powinno być ale dla testów dałem 100
+epochs = 10 # default 20 powinno być ale dla testów dałem 100
 min_loss = float('inf')
 patience = 5
 counter = 0
@@ -286,7 +288,14 @@ test_loss, test_acc = check_accuracy(test_loader, model)
 print(f" Test Loss: {train_loss:.4f}, Test Accuracy: {train_accuracy:.2f}%")
 model.eval()
 
-torch.save(model.state_dict(), 'crosswalks_detection_test.pth')
+torch.save(model.state_dict(), 'crosswalks_detection_trained.pth')
+example = torch.rand(9, 3, 224, 224)
+traced_module = torch.jit.trace(model, example)
+traced_module_optimized = optimize_for_mobile(traced_module)
+traced_module_optimized._save_for_lite_interpreter("model_z_filmiku.ptl")
+
+#torch.onnx.export(traced_module_optimized, example, 'model_onnx.onnx', export_params=True, opset_version=11)
+traced_module_optimized.save('model_torch_script.pt')
 # for param in model.parameters():
 #     print(1)
 # loaded_model = Network()

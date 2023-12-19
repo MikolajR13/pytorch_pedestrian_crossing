@@ -191,7 +191,7 @@ class Network(nn.Module):
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 loaded_model = Network()
-loaded_model.load_state_dict(torch.load('crosswalks_detection_test.pth'))
+loaded_model.load_state_dict(torch.load('crosswalks_detection_test.pth', map_location=device))
 loaded_model.eval()
 for param in loaded_model.parameters():
     print(1)
@@ -199,7 +199,7 @@ crop = 3 # = 3 bo 1/3, dla 4 = 1/4
 
 
 def image_operations(folder_name):
-    folder = 'images_test' #wstawić folder_name
+    folder = 'wtf' #wstawić folder_name
     images_paths = os.listdir(folder) #folder_name
     i = 0
     for images in images_paths:  # jeżeli sama klatka będzie przekazywana to bez tego fora - tylko do testów
@@ -211,7 +211,9 @@ def image_operations(folder_name):
             width, height = image.size
             cropped_image = image.crop((0, height // crop, width, height))
             pieces = []
+            k = 0
             piece_width, piece_height = cropped_image.size
+            os.mkdir(f"wyniki/{images}")
             for i in range(3):
                 for j in range(3):
                     left = j * (piece_width // crop)
@@ -219,6 +221,8 @@ def image_operations(folder_name):
                     right = left + (piece_width // crop)
                     bottom = top +( piece_height // crop)
                     piece = cropped_image.crop((left, top, right, bottom))
+                    piece.save(os.path.join(f"wyniki/{images}", f"{k}.jpg"))
+                    k += 1
                     pieces.append(piece)
             transform = transforms.Compose([ transforms.Resize((224, 224)), transforms.ToTensor()])
             transformed_pieces = [transform(piece) for piece in pieces]
@@ -227,9 +231,13 @@ def image_operations(folder_name):
             outputs = loaded_model(batch_img)
         predicted = torch.argmax(outputs, dim=1)
         print(predicted)
-        ones = torch.nonzero(predicted == 0).squeeze()
+        ones = predicted.tolist()
+        file_path = f"wyniki/{images}/{images}.txt"
 
-        out = ones.tolist()
+        # Zapis przewidywanych wartości do pliku tekstowego
+        with open(file_path, 'w') as file:
+            for value in ones:
+                file.write(f"{value}\n")
     return 1
 
     #przyjmowanie obrazu idk czy video czy klatki
