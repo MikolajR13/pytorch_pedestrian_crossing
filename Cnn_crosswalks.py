@@ -2,17 +2,16 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from certifi.__main__ import args
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from Data_generator import CrossroadsDataset
 import matplotlib.pyplot as plt
 
 #zmienne
-path_to_dataset = 'aaa' #aaa - testowy dataset - żeby sprawdzić czy działa,  dataset - dataset do nauki
+path_to_dataset = 'dataset' #aaa - testowy dataset - żeby sprawdzić czy działa,  dataset - dataset do nauki
 batch_size = 64
 
-dataset = CrossroadsDataset(csv_file='nazwy_plikow1.csv', root_dir=path_to_dataset,
+dataset = CrossroadsDataset(csv_file='nazwy_plikow.csv', root_dir=path_to_dataset,
                             transform=transforms.ToTensor()) # nazwy_plikow1.csv - żeby sprawdzić czy działa,
                                                              # nazwy_plikow.csv - do nauki
 size = len(dataset)
@@ -196,7 +195,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 in_channel = 3
 learning_rate = 0.0001
 batch_size = 64
-epochs = 5 # default 20 powinno być ale dla testów dałem 100
+epochs = 20 # default 20 powinno być ale dla testów dałem 100
 
 #ładujemy model do urządzenia
 model = Network().to(device)
@@ -272,13 +271,13 @@ test_loss, test_acc = check_accuracy(test_loader, model)
 print(f" Test Loss: {train_loss:.4f}, Test Accuracy: {train_accuracy:.2f}%")
 model.eval()
 torch.save(model.state_dict(), 'crosswalks_detection_test.pth')
-for param in model.parameters():
-    print(1)
-loaded_model = Network()
-loaded_model.load_state_dict(torch.load("crosswalks_detection_test.pth"))
-loaded_model.eval()
-for param in loaded_model.parameters():
-    print(2)
+# for param in model.parameters():
+#     print(1)
+# loaded_model = Network()
+# loaded_model.load_state_dict(torch.load("crosswalks_detection_test.pth"))
+# loaded_model.eval()
+# for param in loaded_model.parameters():
+#     print(2)
 
 plt.figure(figsize=(12, 4))
 

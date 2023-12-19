@@ -10,7 +10,7 @@ csv_file = 'nazwy_plikow.csv'
 # Pobranie listy plików z folderu
 files_in_folder = os.listdir(folder_path)
 
-# Wczytanie pliku CSV (zakładając, że pierwsza kolumna zawiera nazwy plików)
+# Wczytanie pliku CSV
 csv_data = pd.read_csv(csv_file)
 
 # Pobranie nazw plików z pierwszej kolumny pliku CSV

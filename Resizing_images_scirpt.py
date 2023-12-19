@@ -2,7 +2,7 @@ from PIL import Image
 import os
 
 # Ścieżki do pięciu wybranych folderów
-folder_paths = ['PTL_Dataset_876x657']
+folder_paths = ['dataset']
 
 for folder_path in folder_paths:
     image_files = [f for f in os.listdir(folder_path) if f.endswith(('jpg', 'JPG', 'png', 'bmp'))]
@@ -18,4 +18,4 @@ for folder_path in folder_paths:
         name, ext = os.path.splitext(img_file)
 
         # Zapisujemy obraz z rozszerzeniem JPG
-        img_resized.save(os.path.join('ptl_nowy', f"{name}.jpg"))
+        img_resized.save(os.path.join('dataset', f"{name}.jpg"))
