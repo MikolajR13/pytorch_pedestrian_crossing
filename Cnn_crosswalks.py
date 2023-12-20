@@ -195,10 +195,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 #parametry sieci
 in_channel = 3
-learning_rate = 0.0001
+learning_rate = 0.00001
 batch_size = 64
-weight_decay = 0.001
-epochs = 40 # default 20 powinno być ale dla testów dałem 100
+weight_decay = 0.0001
+epochs = 5 # default 20 powinno być ale dla testów dałem 100
 min_loss = float('inf')
 patience = 6
 counter = 0
