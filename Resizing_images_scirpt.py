@@ -2,11 +2,11 @@ from PIL import Image
 import os
 
 # Ścieżki do pięciu wybranych folderów
-folder_paths = ['dataset']
+folder_paths = ['bez_pasow', 'pasy']
 
 for folder_path in folder_paths:
     image_files = [f for f in os.listdir(folder_path) if f.endswith(('jpg', 'JPG', 'png', 'bmp'))]
-
+    print(image_files)
     for img_file in image_files:
         img_path = os.path.join(folder_path, img_file)
 

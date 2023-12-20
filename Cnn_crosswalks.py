@@ -10,15 +10,15 @@ from torch.utils.mobile_optimizer import optimize_for_mobile
 
 
 #zmienne
-path_to_dataset = 'aaa' #aaa - testowy dataset - żeby sprawdzić czy działa,  dataset - dataset do nauki
+path_to_dataset = 'dataset' #aaa - testowy dataset - żeby sprawdzić czy działa,  dataset - dataset do nauki
 batch_size = 64
 
-dataset = CrossroadsDataset(csv_file='nazwy_plikow1.csv', root_dir=path_to_dataset,
+dataset = CrossroadsDataset(csv_file='nazwy_plikow.csv', root_dir=path_to_dataset,
                             transform=transforms.ToTensor()) # nazwy_plikow1.csv - żeby sprawdzić czy działa,
                                                              # nazwy_plikow.csv - do nauki
 size = len(dataset)
-val_len = int(size/100*15)
-test_len = int(size/100*15)
+val_len = int(size/100*10)
+test_len = int(size/100*10)
 train_len = size - val_len - test_len
 
 train_set, val_set, test_set = torch.utils.data.random_split(dataset, [train_len, val_len, test_len])
@@ -197,9 +197,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 in_channel = 3
 learning_rate = 0.0001
 batch_size = 64
-epochs = 10 # default 20 powinno być ale dla testów dałem 100
+weight_decay = 0.001
+epochs = 40 # default 20 powinno być ale dla testów dałem 100
 min_loss = float('inf')
-patience = 5
+patience = 6
 counter = 0
 
 #ładujemy model do urządzenia
@@ -208,7 +209,7 @@ model = Network().to(device)
 #określenie funkcji straty i optymalizatora
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 #sprawdzanie accuracy
 
 

@@ -24,10 +24,10 @@ def adjust_brightness(image, factor):
 
 def add_noise(image, a):
     if a % 6 == 0:
-        noise = np.random.normal(0,20, image.shape)
+        noise = np.random.normal(0,10, image.shape)
         noisy_image = np.clip(image + noise, 0, 255).astype(np.int32)
     else:
-        noise = np.random.normal(0, 30, image.shape)
+        noise = np.random.normal(0, 20, image.shape)
         noisy_image = np.clip(image + noise, 0, 255).astype(np.int32)
     return noisy_image
 
@@ -37,19 +37,19 @@ def add_shadow(image, i):
     if i % 3 == 0:
         shadow_mask = np.zeros_like(image[:, :, 0])
         shadow_mask[:, :image.shape[1]] = 255  # Dodanie zacienienia w lewej połowie obrazu
-        shadow_intensity = random.randint(75, 200)  # Intensywność zacienienia
+        shadow_intensity = random.randint(75, 100)  # Intensywność zacienienia
         shadow = np.where(shadow_mask == 255, shadow_intensity, 0)
         image[:, :, 2] += shadow  # Zmniejszenie wartości kanału niebieskiego dla zacienienia
     elif i % 3 == 1:
         shadow_mask = np.zeros_like(image[:, :, 1])
         shadow_mask[:, :image.shape[1]] = 255  # Dodanie zacienienia w lewej połowie obrazu
-        shadow_intensity = random.randint(40, 110)  # Intensywność zacienienia
+        shadow_intensity = random.randint(40, 80)  # Intensywność zacienienia
         shadow = np.where(shadow_mask == 255, shadow_intensity, 0)
         image[:, :, 1] -= shadow  # Zmniejszenie wartości kanału niebieskiego dla zacienienia
     elif i % 3 == 2:
         shadow_mask = np.zeros_like(image[:, :, 0])
         shadow_mask[:, :image.shape[1]] = 255  # Dodanie zacienienia w lewej połowie obrazu
-        shadow_intensity = random.randint(40, 110)  # Intensywność zacienienia
+        shadow_intensity = random.randint(40, 80)  # Intensywność zacienienia
         shadow = np.where(shadow_mask == 255, shadow_intensity, 0)
         image[:, :, 0] += shadow  # Zmniejszenie wartości kanału niebieskiego dla zacienienia
     return image
@@ -66,7 +66,7 @@ def change_perspective(image, scale):
 
 def main():
     folder_path = "bez_pasow_2"
-    output_path = "bez_pasow_3"
+    output_path = "bez_obrobione"
     images = os.listdir(folder_path)
 
     if not images:
@@ -74,7 +74,10 @@ def main():
         return
     i = 0
     a = 0
+    stop = 0
     for image_name in images:
+        if stop == 3500:
+            exit()
         image_path = os.path.join(folder_path, image_name)
         image = cv2.imread(image_path)
 
@@ -83,25 +86,25 @@ def main():
             continue
         #perspective_scale = random.uniform(0.5, 0.6)
         #perspective_image = change_perspective(image, perspective_scale)
-        rotation_angle = random.randint(10, 75)
+        rotation_angle = random.randint(5, 10)
         rotated_image = rotate_image(image, rotation_angle)
 
-        brightness_factor = random.randint(60, 80)
+        brightness_factor = random.randint(80, 100)
         adjusted_image = adjust_brightness(rotated_image, brightness_factor)
         if i % 6 == 0 :
             noisy_image = add_noise(adjusted_image, i)
             shadowed_image = add_shadow(noisy_image, a)
-            transpose = cv2.transpose(shadowed_image, 3)
-            flipped = cv2.flip(transpose, 1)
+            #transpose = cv2.transpose(shadowed_image, 3)
+            #flipped = cv2.flip(transpose, 1)
             output_image_path = os.path.join(output_path, f"modified_{image_name}")
-            cv2.imwrite(output_image_path, flipped)
+            cv2.imwrite(output_image_path, shadowed_image)
             a += 1
         else:
             noisy_image = add_noise(adjusted_image, i)
-            transpose = cv2.transpose(noisy_image, 3)
-            flipped = cv2.flip(transpose, 1)
+            #transpose = cv2.transpose(noisy_image, 3)
+            #flipped = cv2.flip(transpose, 1)
             output_image_path = os.path.join(output_path, f"modified_{image_name}")
-            cv2.imwrite(output_image_path, flipped)
+            cv2.imwrite(output_image_path, noisy_image)
         i += 1
 
     print(f"Zmodyfikowane zdjęcia zapisano w folderze: {output_path}")

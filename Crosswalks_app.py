@@ -204,6 +204,7 @@ def image_operations(folder_name):
     i = 0
     for images in images_paths:  # jeżeli sama klatka będzie przekazywana to bez tego fora - tylko do testów
         print(images)
+        time_start = timeit.timeit()
         if images.endswith(('.png', '.jpg', '.jpeg', '.JPG')):
 
             image_path = os.path.join(folder, images)
@@ -232,6 +233,11 @@ def image_operations(folder_name):
         predicted = torch.argmax(outputs, dim=1)
         print(predicted)
         ones = predicted.tolist()
+        time_end = timeit.timeit()
+        time = time_end - time_start
+        print(time, "pierwszy")
+        time = time_start - time_end
+        print(time, "drugi")
         file_path = f"wyniki/{images}/{images}.txt"
 
         # Zapis przewidywanych wartości do pliku tekstowego
