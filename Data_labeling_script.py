@@ -1,7 +1,7 @@
 import os
 import csv
 # Ścieżki do pięciu wybranych folderów
-folder_paths = ['bez_pasow', 'pasy']
+folder_paths = ['bez_pasow', 'pasy', 'poziome_wsz']
 
 csv_file = 'nazwy_plikow.csv'
 i = 0

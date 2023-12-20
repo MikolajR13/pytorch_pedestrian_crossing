@@ -24,10 +24,10 @@ def adjust_brightness(image, factor):
 
 def add_noise(image, a):
     if a % 6 == 0:
-        noise = np.random.normal(0,10, image.shape)
+        noise = np.random.normal(0,5, image.shape)
         noisy_image = np.clip(image + noise, 0, 255).astype(np.int32)
     else:
-        noise = np.random.normal(0, 20, image.shape)
+        noise = np.random.normal(0, 5, image.shape)
         noisy_image = np.clip(image + noise, 0, 255).astype(np.int32)
     return noisy_image
 
@@ -65,8 +65,8 @@ def change_perspective(image, scale):
 
 
 def main():
-    folder_path = "bez_pasow_2"
-    output_path = "bez_obrobione"
+    folder_path = "bez_pasow_3"
+    output_path = "bez_pasow_3_obr"
     images = os.listdir(folder_path)
 
     if not images:
@@ -89,7 +89,7 @@ def main():
         rotation_angle = random.randint(5, 10)
         rotated_image = rotate_image(image, rotation_angle)
 
-        brightness_factor = random.randint(80, 100)
+        brightness_factor = random.randint(85, 100)
         adjusted_image = adjust_brightness(rotated_image, brightness_factor)
         if i % 6 == 0 :
             noisy_image = add_noise(adjusted_image, i)

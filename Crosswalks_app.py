@@ -215,6 +215,7 @@ def image_operations(folder_name):
             k = 0
             piece_width, piece_height = cropped_image.size
             os.mkdir(f"wyniki/{images}")
+            image.save(os.path.join(f"wyniki/{images}", f"{images}.jpg"))
             for i in range(3):
                 for j in range(3):
                     left = j * (piece_width // crop)

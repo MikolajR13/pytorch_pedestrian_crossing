@@ -31,10 +31,10 @@ def merge_images(folder1_path, folder2_path, output_folder):
         img2 = cv2.imread(image2_path)
         img3 = cv2.imread(image3_path)
         img4 = cv2.imread(image4_path)
-        img1 = cv2.resize(img1, (512, 512))
-        img2 = cv2.resize(img2, (512, 512))
-        img3 = cv2.resize(img3, (512, 512))
-        img4 = cv2.resize(img4, (512, 512))
+        img1 = cv2.resize(img1, (224, 224))
+        img2 = cv2.resize(img2, (224, 224))
+        img3 = cv2.resize(img3, (224, 224))
+        img4 = cv2.resize(img4, (224, 224))
         if any(img is None for img in [img1, img2, img3, img4]):
             print(f"Nie można wczytać wszystkich obrazów dla iteracji {i + 1}.")
             continue
@@ -59,9 +59,9 @@ def merge_images(folder1_path, folder2_path, output_folder):
     print(f"Stworzono {i + 1} sklejonych i zmienionych rozmiarów zdjęć.")
 
 def main():
-    folder1_path = "to_merge_pasy"  # Ścieżka do folderu 1
+    folder1_path = "to_merge_poziom"  # Ścieżka do folderu 1
     folder2_path = "to_merge_nie_pasy"  # Ścieżka do folderu 2
-    output_folder = "merged"  # Ścieżka do folderu wynikowego
+    output_folder = "merged_poziom_nie_uciete"  # Ścieżka do folderu wynikowego
 
     merge_images(folder1_path, folder2_path, output_folder)
 
