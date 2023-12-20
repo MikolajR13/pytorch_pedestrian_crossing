@@ -260,17 +260,6 @@ for epoch in range(epochs):
 
         optimizer.step()
 
-    if loss < min_loss:
-        min_loss = loss
-        counter = 0
-    else:
-        counter += 1
-
-    if counter == patience:
-        print("Patience break")
-        break
-
-
     model.eval()  # Ustawienie modelu w tryb ewaluacji
     val_loss, val_accuracy = check_accuracy(val_loader, model)  # Ocena na zbiorze walidacyjnym
     val_losses.append(val_loss)
@@ -280,6 +269,17 @@ for epoch in range(epochs):
     train_losses.append(train_loss)
     train_accuracies.append(train_accuracy)
     print(f"Epoch [{epoch + 1}/{epochs}] Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.2f}%")
+
+    if train_loss < min_loss:
+        min_loss = train_loss
+        counter = 0
+    else:
+        counter += 1
+
+    if counter == patience:
+        print("Patience break")
+        break
+
     model.train()  # Powrót do trybu treningowego
 
 
